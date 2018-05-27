@@ -40,7 +40,4 @@
  * 3. Run API class to check whether the api_name and api_service is
  *    exist on the system or not? 
  */
-
- /* test for update on Local GIT and GITHUB */
-
  ?>
