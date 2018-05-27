@@ -31,6 +31,7 @@
     define('__BASE',   $system_path);
     define('__HOOK',   $hook_path);
     define('__USERLIB',$user_lib_path);
+    define('__SYSTEM', $system_path);
 
 /**
  * TODO:
@@ -40,4 +41,7 @@
  * 3. Run API class to check whether the api_name and api_service is
  *    exist on the system or not? 
  */
+
+ /* test for update on Local GIT and GITHUB */
+
  ?>
