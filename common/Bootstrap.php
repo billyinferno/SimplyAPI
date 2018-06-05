@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Bootstap
- * --------
+ * Bootstrap
+ * ---------
  * this will load all the configuration, constant, and common function
  * that needed to run the Framework.
  */
@@ -40,20 +40,22 @@ if (! check_php_version('5.4')) {
       // set all the global variables that we want to protect.
       $_protected = array(
          '_SERVER',
-			'_GET',
-			'_POST',
-			'_FILES',
-			'_REQUEST',
-			'_SESSION',
-			'_ENV',
-			'_COOKIE',
-			'GLOBALS',
-			'HTTP_RAW_POST_DATA',
-			'system_path',
-			'application_folder',
-			'view_folder',
-			'_protected',
-			'_registered'
+         '_GET',
+         '_POST',
+         '_FILES',
+         '_REQUEST',
+			   '_SESSION',
+			   '_ENV',
+			   '_COOKIE',
+			   'GLOBALS',
+			   'HTTP_RAW_POST_DATA',
+			   'common_path',
+			   'system_path',
+         'hook_path',
+         'user_lib_path',
+         'builder_path',
+			   '_protected',
+			   '_registered'
       );
 
 
@@ -80,7 +82,41 @@ if (! check_php_version('5.4')) {
 }
 
 // ------------------------------------------------------------------------
-// after that setup the error handler for the application.
+// setup the error handler for the application.
 // ------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------
+// load the config so we can used it on the other function
+// in case any error on the config we can trap it here instead process the
+// other module while the configuration file is wrong.
+// ------------------------------------------------------------------------
+// handle the get config to populate the static variable outside of
+// config class load.
+get_config();
+
+// generate config class since this class will be used by a lot.
+$cfg =& load_class('Config', 'system.core.Config');
+
+// ------------------------------------------------------------------------
+// once all the preparation ready, we can start the benchmark module
+// based on the benchmark configuration set on the config.
+// ------------------------------------------------------------------------
+if (config_item("run_benchmark")) {
+    // TODO: run the benchmark...
+}
+
+// -----------------------------------------------------------------------
+// load the database driver based on the config, and open the database.
+// ensure that we can open the database before we continue.
+// -----------------------------------------------------------------------
+// TODO: load database class and open database for SimplyAPI
+// 
+
+
+// ------------------------------------------------------------------------
+// Base Processing
+// ------------------------------------------------------------------------
+// first check whether user specified any hook
+
+// application  is running!
 echo "bootstrap run";

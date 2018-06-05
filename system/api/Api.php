@@ -1,7 +1,7 @@
 <?php
 defined('__BASE') or exit('Direct script access is prohibited');
 
-class CWX_API {
+class API {
     public $config;
     public $db;
     public $api;
@@ -47,8 +47,7 @@ class CWX_API {
      */
     private function __checkApi() {
         // TODO:
-        // 1. If API exists, load a new CWX_Service class and put
-        //    all the information there.
+        // 1. If API exists, load a new Service class and put all the information there.
     }
 
     /**

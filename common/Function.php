@@ -28,6 +28,27 @@ if (!function_exists('check_php_version')) {
     }
 }
 
+if (!function_exists('is_https')) {
+    function is_https() {
+        if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') {
+            return TRUE;
+        }
+        else {
+            if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+                return TRUE;
+            }
+            else {
+                if (!empty($_SERVER['HTTP_FRONT_END_HTTPS']) && strtolower($_SERVER['HTTP_FRONT_END_HTTPS']) !== 'off' ) {
+                    return TRUE;
+                }
+            }
+        }
+    
+        // other than that, return false
+        return FALSE;
+    }
+}
+
 if (!function_exists('get_config')) {
     /**
      * get_config
@@ -47,7 +68,7 @@ if (!function_exists('get_config')) {
         // it means that the config is already filled before.
         if (empty($config)) {
             // $config is still empty, load the config
-            $config_path = __USER.'config'.DIRECTORY_SEPARATOR.'Config.php';
+            $config_path = __USERLIB.'config'.DIRECTORY_SEPARATOR.'Config.php';
 
             // load the config file
             require($config_path);
@@ -90,7 +111,7 @@ if (!function_exists('config_item')) {
         }
 
         // now check whether the key is exist on the config data or not?
-        if (isset($_config[0][$key])) ? $_config[0][$key] : NULL;
+        return (isset($_config[0][$key])) ? $_config[0][$key] : NULL;
     }
 }
 
@@ -156,7 +177,7 @@ if (!function_exists('load_class')) {
                     $real_path = __SYSTEM.$real_path;
                 }
                 else if($sys_path == "user") {
-                    $real_path == __USER.$real_path;
+                    $real_path == __USERLIB.$real_path;
                 }
 
                 // once we finished setup the actual location of the class file, we can check whether the
@@ -176,23 +197,29 @@ if (!function_exists('load_class')) {
                             exit(EXIT_COMMON);
                         }
                         else {
-                            $_classes[$name] = isset($param) ? new $name[$param] : new $name;
+                            $_classes[$name] = isset($param) ? new $name($param) : new $name;
                             return $_classes[$name];
                         }
                     }
+                }
+                else {
+                    // class file not exists
+                    header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+                    echo 'Application class location for class: '.$name.', is missing from the directory. Please check or contact your administrator.';
+                    exit(EXIT_COMMON);
                 }
             }
             else {
                 // we cannot load this, since this file is not on the path
                 header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
-                echo 'Application class location for class: '.$name.', is missing from the directory. Please check or contact your administrator.';
+                echo 'Wrong class location for class '.$name.'. Please check or contact your administrator.';
                 exit(EXIT_COMMON);
             } // end of if (count($actual_path) > 1)...
         }
         else {
             // nothing to load
             header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
-            echo 'Application class location for class: '.$name.', is missing from the directory. Please check or contact your administrator.';
+            echo 'Null parameter for the class name and class location. Please check or contact your administrator.';
             exit(EXIT_COMMON);
         } // end of if (not($location === NULL && trim($location) === ""))...
     }
@@ -218,7 +245,7 @@ if (!function_exists('show_error')) {
             $exit_code = EXIT_ERROR_OTHER;
         }
 
-        $_error &= load_class('Exceptions', 'system.core.Exceptions')
+        $_error &= load_class('Exceptions', 'system.core.Exceptions');
         // show the error
         echo $_error->show_error($title, $message, 'general', $code);
     }
@@ -250,11 +277,12 @@ if (!function_exists('_error_handler')) {
      */
     function _error_handler($severity, $message, $filepath, $line) {
         // check whether this error is equal with the severity given or not?
-        $is_error = (((E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR) & $severity) === $severity)
+        $is_error = (((E_ERROR | E_PARSE | E_COMPILE_ERROR | E_CORE_ERROR | E_USER_ERROR) & $severity) === $severity);
 
         // for error we need to set the HTTP header into 500 to indicate 'Internal Server Error'
         if ($is_error) {
-            set_status_head 
+            // set header as internal error
+            set_http_header(500); 
         }
     }
 }
